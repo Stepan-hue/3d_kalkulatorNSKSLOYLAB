@@ -1323,7 +1323,8 @@
 
     try {
       await fetch(`https://telegram.org{TG_BOT_TOKEN}/sendMessage`, {
-        const tgUrl = "https://" + "api.telegram.org" + "/bot" + TG_BOT_TOKEN + "/sendMessage";
+             const tgDocUrl = "https://" + "api.telegram.org" + "/bot" + TG_BOT_TOKEN + "/sendDocument";
+        await fetch(tgDocUrl, {
 await fetch(tgUrl, {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1339,7 +1340,8 @@ await fetch(tgUrl, {
         formData.append("document", stlFile, stlFile.name);
         formData.append("caption", `📦 STL-модель к заказу ${order.id}`);
 
-        const tgDocUrl = "https://" + "api.telegram.org" + "/bot" + TG_BOT_TOKEN + "/sendDocument";
+             const tgDocUrl = "https://" + "api.telegram.org" + "/bot" + TG_BOT_TOKEN + "/sendDocument";
+        await fetch(tgDocUrl, {
 await fetch(tgDocUrl, {
           method: "POST",
           body: formData

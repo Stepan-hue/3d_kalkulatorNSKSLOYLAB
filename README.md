@@ -1425,7 +1425,7 @@
 
     orders.unshift(newOrder);
     saveOrders();
-    renderPvzOrders(sendOrderToTelegram(newOrder, uploadedStlFile);
+    renderPvzOrders();
 
     document.getElementById("client-order-id").textContent = orderId;
     document.getElementById("client-order-success").style.display = "block";

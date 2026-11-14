@@ -1304,6 +1304,50 @@
   }
 
   async function createOrder() {
+      async function sendOrderToTelegram(order, stlFile) {
+    if (!TG_BOT_TOKEN || !TG_CHAT_ID) return;
+
+    const text = [
+      `🆕 <b>НОВЫЙ ЗАКАЗ ${order.id}</b>`,
+      `👤 <b>Клиент:</b> ${order.clientName}`,
+      `📞 <b>Телефон:</b> ${order.clientPhone}`,
+      `✉️ <b>Email:</b> ${order.clientEmail}`,
+      `📍 <b>Адрес / ПВЗ:</b> ${order.clientAddress}`,
+      `🎨 <b>Материал:</b> PETG (${order.color})`,
+      `⚙️ <b>Заполнение:</b> ${order.infill}`,
+      `📐 <b>Габариты:</b> ${order.dims}`,
+      `⚖️ <b>Вес:</b> ${order.weight.toFixed(1)} г`,
+      `💰 <b>Сумма:</b> ${order.price} ₽`,
+      `💬 <b>Комментарий:</b> ${order.comment || "нет"}`
+    ].join("\n");
+
+    try {
+      await fetch(`https://telegram.org{TG_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TG_CHAT_ID,
+          text: text,
+          parse_mode: "HTML"
+        })
+      });
+
+      if (stlFile) {
+        const formData = new FormData();
+        formData.append("chat_id", TG_CHAT_ID);
+        formData.append("document", stlFile, stlFile.name);
+        formData.append("caption", `📦 STL-модель к заказу ${order.id}`);
+
+        await fetch(`https://telegram.org{TG_BOT_TOKEN}/sendDocument`, {
+          method: "POST",
+          body: formData
+        });
+      }
+    } catch (err) {
+      console.error("Ошибка отправки в Telegram:", err);
+    }
+  }
+
     const firstName = document.getElementById("client-first-name").value.trim();
     const lastName = document.getElementById("client-last-name").value.trim();
     const clientPhone = document.getElementById("client-phone").value.trim();
@@ -1369,6 +1413,7 @@
       date: new Date().toLocaleDateString("ru-RU")
     };
 
+        await sendOrderToTelegram(newOrder, uploadedStlFile);
     orders.unshift(newOrder);
     saveOrders();
     renderPvzOrders();

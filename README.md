@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -784,63 +785,7 @@
     </div>
   </div>
 </div>
-<script> const TELEGRAM_BOT_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
-  const TELEGRAM_CHAT_ID = "8323361173";
 
-  function escapeHtml(str) {
-    return String(str || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  }
-
-  async function sendOrderToTelegram(order, stlFile) {
-    const messageText = [
-      `🆕 <b>Новый заказ 3D-печати: ${escapeHtml(order.id)}</b>`,
-      `📅 Дата: ${escapeHtml(order.date)}`,
-      ``,
-      `👤 <b>Клиент:</b> ${escapeHtml(order.clientName)}`,
-      `📞 <b>Телефон:</b> ${escapeHtml(order.clientPhone)}`,
-      `✉️ <b>Email:</b> ${escapeHtml(order.clientEmail)}`,
-      `📍 <b>Адрес / ПВЗ:</b> ${escapeHtml(order.clientAddress)}`,
-      ``,
-      `📦 <b>Модель:</b> ${escapeHtml(order.fileName)}`,
-      `📐 <b>Габариты:</b> ${escapeHtml(order.dims)}`,
-      `🧊 <b>Объём:</b> ${escapeHtml(order.volume)}`,
-      `🎨 <b>Материал:</b> PETG (${escapeHtml(order.color)})`,
-      `🧱 <b>Заполнение:</b> ${escapeHtml(order.infill)}`,
-      `⚖️ <b>Расчётный вес:</b> ${order.weight.toFixed(1)} г`,
-      `💰 <b>Стоимость:</b> ${order.price} ₽`,
-      ``,
-      `💬 <b>Комментарий:</b> ${escapeHtml(order.comment || "нет")}`
-    ].join("\n");
-
-    try {
-      await fetch(`https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: messageText,
-          parse_mode: "HTML"
-        })
-      });
-
-      if (stlFile && stlFile.size <= 50 * 1024 * 1024) {
-        const formData = new FormData();
-        formData.append("chat_id", TELEGRAM_CHAT_ID);
-        formData.append("document", stlFile, stlFile.name);
-        formData.append("caption", `📎 STL-файл к заказу ${order.id} (${order.clientName})`);
-
-        await fetch(`https://telegram.org{TELEGRAM_BOT_TOKEN}/sendDocument`, {
-          method: "POST",
-          body: formData
-        });
-      }
-    } catch (err) {
-      console.error("Ошибка отправки в Telegram:", err);
-    }
-  }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

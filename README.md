@@ -713,27 +713,6 @@
       </div>
 
       <button class="btn btn-primary" onclick="createOrder()">Оформить заказ</button>
-        <script>
-    const TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
-    const CHAT_ID = "8323361173";
-
-    document.getElementById("sendBtn").addEventListener("click", function() {
-      const TEXT = "Новая заявка с сайта!";
-
-      fetch(`https://telegram.org{TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: TEXT,
-          parse_mode: "HTML"
-        })
-      })
-      .then(res => res.json())
-      .then(data => alert("Сообщение отправлено!"))
-      .catch(err => console.error(err));
-    });
-  </script>
 
       <div class="client-order-success" id="client-order-success">
         <h3>✅ Заказ <span id="client-order-id"></span> успешно оформлен!</h3>
@@ -1391,27 +1370,7 @@
 
     orders.unshift(newOrder);
     saveOrders();
-    renderPvzOrders(); <script>
-    const TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
-    const CHAT_ID = "8323361173";
-
-    document.getElementById("sendBtn").addEventListener("click", function() {
-      const TEXT = "Новая заявка с сайта!";
-
-      fetch(`https://telegram.org{TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: TEXT,
-          parse_mode: "HTML"
-        })
-      })
-      .then(res => res.json())
-      .then(data => alert("Сообщение отправлено!"))
-      .catch(err => console.error(err));
-    });
-  </script>
+    renderPvzOrders();
 
     document.getElementById("client-order-id").textContent = orderId;
     document.getElementById("client-order-success").style.display = "block";

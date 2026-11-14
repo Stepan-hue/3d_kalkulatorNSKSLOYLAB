@@ -712,7 +712,7 @@
         <span class="total-price" id="total-price">400 ₽</span>
       </div>
 
-      <button class="btn btn-primary" onclick="createOrder()">Оформить заказ</button> <!DOCTYPE html>
+      <button class="btn btn-primary" onclick="createOrder()">Оформить заказ<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">

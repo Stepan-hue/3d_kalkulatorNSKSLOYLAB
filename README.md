@@ -1,50 +1,8 @@
-
 <!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>3d_kalkulatorNSKSLOYLAB</title>
-<meta name="generator" content="Jekyll v3.10.0" />
-<meta property="og:title" content="3d_kalkulatorNSKSLOYLAB" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="https://stepan-hue.github.io/3d_kalkulatorNSKSLOYLAB/" />
-<meta property="og:url" content="https://stepan-hue.github.io/3d_kalkulatorNSKSLOYLAB/" />
-<meta property="og:site_name" content="3d_kalkulatorNSKSLOYLAB" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="3d_kalkulatorNSKSLOYLAB" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","headline":"3d_kalkulatorNSKSLOYLAB","name":"3d_kalkulatorNSKSLOYLAB","url":"https://stepan-hue.github.io/3d_kalkulatorNSKSLOYLAB/"}</script>
-<!-- End Jekyll SEO tag -->
-
-    <link rel="stylesheet" href="/3d_kalkulatorNSKSLOYLAB/assets/css/style.css?v=43dbe195e77e8be0f1a3d80cdb4c2da2e788ed5e">
-    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
-
-<!-- Setup Google Analytics -->
-
-
-
-<!-- You can set your favicon here -->
-<!-- link rel="shortcut icon" type="image/x-icon" href="/3d_kalkulatorNSKSLOYLAB/favicon.ico" -->
-
-<!-- end custom head snippets -->
-
-  </head>
-  <body>
-    <div class="container-lg px-3 my-5 markdown-body">
-      
-      <h1><a href="https://stepan-hue.github.io/3d_kalkulatorNSKSLOYLAB/">3d_kalkulatorNSKSLOYLAB</a></h1>
-      
-
-      <p>&lt;!DOCTYPE html&gt;</p>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Калькулятор 3D-печати (PETG) и Приёмка ПВЗ</title>
   <style>
     :root {
@@ -643,13 +601,13 @@
         <div class="file-drop" id="drop-zone" onclick="document.getElementById('stl-input').click()">
           <div id="file-label"><strong>Нажмите для выбора STL-файла</strong> или перетащите его сюда</div>
           <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Поддерживаются Binary и ASCII .STL файлы</div>
-          <input type="file" id="stl-input" accept=".stl" />
+          <input type="file" id="stl-input" accept=".stl">
         </div>
       </div>
 
       <div class="form-group">
         <label>Материал</label>
-        <input type="text" value="PETG (Прочный термостойкий пластик) — 8 ₽/г" readonly="" style="background: #f1f5f9; font-weight: 600; color: #0f172a;" />
+        <input type="text" value="PETG (Прочный термостойкий пластик) — 8 ₽/г" readonly style="background: #f1f5f9; font-weight: 600; color: #0f172a;">
       </div>
 
       <div class="form-group">
@@ -663,7 +621,7 @@
           <label for="infill-select">Заполнение</label>
           <select id="infill-select" onchange="recalculate()">
             <option value="0.15">15% (Лёгкое)</option>
-            <option value="0.20" selected="">20% (Стандарт)</option>
+            <option value="0.20" selected>20% (Стандарт)</option>
             <option value="0.35">35% (Плотное)</option>
             <option value="0.50">50% (Усиленное)</option>
             <option value="1.00">100% (Монолит)</option>
@@ -673,7 +631,7 @@
 
       <div class="form-group">
         <label for="manual-weight">Расчётный вес детали (г) — заполняется автоматически по STL</label>
-        <input type="number" id="manual-weight" value="50" min="1" step="0.1" oninput="onManualWeightInput()" />
+        <input type="number" id="manual-weight" value="50" min="1" step="0.1" oninput="onManualWeightInput()">
       </div>
 
       <div class="contact-box">
@@ -681,26 +639,26 @@
         <div class="form-row" style="margin-bottom: 10px;">
           <div>
             <label for="client-first-name">Имя *</label>
-            <input type="text" id="client-first-name" placeholder="Иван" required="" />
+            <input type="text" id="client-first-name" placeholder="Иван" required>
           </div>
           <div>
             <label for="client-last-name">Фамилия *</label>
-            <input type="text" id="client-last-name" placeholder="Иванов" required="" />
+            <input type="text" id="client-last-name" placeholder="Иванов" required>
           </div>
         </div>
         <div class="form-row" style="margin-bottom: 10px;">
           <div>
             <label for="client-phone">Номер телефона *</label>
-            <input type="tel" id="client-phone" placeholder="+7 (999) 123-45-67" required="" />
+            <input type="tel" id="client-phone" placeholder="+7 (999) 123-45-67" required>
           </div>
           <div>
             <label for="client-email">Электронная почта *</label>
-            <input type="email" id="client-email" placeholder="client@example.ru" required="" />
+            <input type="email" id="client-email" placeholder="client@example.ru" required>
           </div>
         </div>
         <div class="form-group" style="margin-bottom: 0;">
           <label for="client-address">Адрес доставки / ПВЗ *</label>
-          <input type="text" id="client-address" placeholder="г. Новосибирск, ул. Ленина, д. 10, кв. 25" required="" />
+          <input type="text" id="client-address" placeholder="г. Новосибирск, ул. Ленина, д. 10, кв. 25" required>
         </div>
       </div>
 
@@ -716,7 +674,7 @@
       <div class="viewer-container" id="viewer-box">
         <canvas id="viewer-canvas"></canvas>
         <div class="viewer-placeholder" id="viewer-placeholder">
-          Загрузите STL-файл, чтобы увидеть 3D-модель<br />и получить точный расчёт по сетке
+          Загрузите STL-файл, чтобы увидеть 3D-модель<br>и получить точный расчёт по сетке
         </div>
         <div class="viewer-hint">ЛКМ — вращение | Колёсико — масштаб | ПКМ — сдвиг</div>
       </div>
@@ -788,7 +746,7 @@
 
         <div class="form-group">
           <label for="manual-order-code">Или введите номер заказа вручную / отсканируйте</label>
-          <input type="text" id="manual-order-code" placeholder="Например: ORD-1001" />
+          <input type="text" id="manual-order-code" placeholder="Например: ORD-1001">
         </div>
 
         <button class="btn btn-success" onclick="confirmAcceptance()">✅ Подтвердить приёмку</button>
@@ -818,7 +776,7 @@
   <div class="modal-card">
     <h3 style="margin: 0 0 6px 0; font-size: 19px;">Доступ для сотрудников</h3>
     <p style="margin: 0; font-size: 13px; color: var(--text-muted);">Введите секретный код приёмки ПВЗ:</p>
-    <input type="password" id="secret-pin-input" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric" />
+    <input type="password" id="secret-pin-input" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
     <div id="pin-error" class="pin-error">Неверный код доступа</div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeSecretModal()">Отмена</button>
@@ -833,8 +791,6 @@
 
 <script>
   const SECRET_CODE = "1976";
-  const TG_BOT_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
-  const TG_CHAT_ID = "8323361173";
   const PETG_PRICE_PER_GRAM = 8;
   const PETG_DENSITY = 1.27;
   const DEFAULT_WALLS = 3;
@@ -1346,54 +1302,6 @@
   }
 
   async function createOrder() {
-      async function sendOrderToTelegram(order, stlFile) {
-    if (!TG_BOT_TOKEN || !TG_CHAT_ID) return;
-
-    const text = [
-      `🆕 <b>НОВЫЙ ЗАКАЗ ${order.id}</b>`,
-      `👤 <b>Клиент:</b> ${order.clientName}`,
-      `📞 <b>Телефон:</b> ${order.clientPhone}`,
-      `✉️ <b>Email:</b> ${order.clientEmail}`,
-      `📍 <b>Адрес / ПВЗ:</b> ${order.clientAddress}`,
-      `🎨 <b>Материал:</b> PETG (${order.color})`,
-      `⚙️ <b>Заполнение:</b> ${order.infill}`,
-      `📐 <b>Габариты:</b> ${order.dims}`,
-      `⚖️ <b>Вес:</b> ${order.weight.toFixed(1)} г`,
-      `💰 <b>Сумма:</b> ${order.price} ₽`,
-      `💬 <b>Комментарий:</b> ${order.comment || "нет"}`
-    ].join("\n");
-
-    try {
-      await fetch(`https://telegram.org{TG_BOT_TOKEN}/sendMessage`, {
-             const tgDocUrl = "https://" + "api.telegram.org" + "/bot" + TG_BOT_TOKEN + "/sendDocument";
-        await fetch(tgDocUrl, {
-await fetch(tgUrl, {
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TG_CHAT_ID,
-          text: text,
-          parse_mode: "HTML"
-        })
-      });
-
-      if (stlFile) {
-        const formData = new FormData();
-        formData.append("chat_id", TG_CHAT_ID);
-        formData.append("document", stlFile, stlFile.name);
-        formData.append("caption", `📦 STL-модель к заказу ${order.id}`);
-
-             const tgDocUrl = "https://" + "api.telegram.org" + "/bot" + TG_BOT_TOKEN + "/sendDocument";
-        await fetch(tgDocUrl, {
-await fetch(tgDocUrl, {
-          method: "POST",
-          body: formData
-        });
-      }
-    } catch (err) {
-      console.error("Ошибка отправки в Telegram:", err);
-    }
-  }
-
     const firstName = document.getElementById("client-first-name").value.trim();
     const lastName = document.getElementById("client-last-name").value.trim();
     const clientPhone = document.getElementById("client-phone").value.trim();
@@ -1459,7 +1367,6 @@ await fetch(tgDocUrl, {
       date: new Date().toLocaleDateString("ru-RU")
     };
 
-        await sendOrderToTelegram(newOrder, uploadedStlFile);
     orders.unshift(newOrder);
     saveOrders();
     renderPvzOrders();

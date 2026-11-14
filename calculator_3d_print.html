@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор 3D-печати (PETG) и Приёмка ПВЗ</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      cursor: default;
+      user-select: none;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    #tab-pvz {
+      display: none;
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+
+    #tab-pvz.active {
+      background: #d97706;
+      color: #fff;
+      border-color: #d97706;
+    }
+
+    #btn-lock-pvz {
+      display: none;
+      padding: 10px 14px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #btn-lock-pvz:hover {
+      background: #fee2e2;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 540px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .file-drop {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f8fafc;
+    }
+
+    .file-drop:hover, .file-drop.dragover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .file-drop input {
+      display: none;
+    }
+
+    .color-palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .color-swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #cbd5e1;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.08);
+    }
+
+    .color-swatch.selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+      transform: scale(1.1);
+    }
+
+    .slicer-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .slicer-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .contact-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .contact-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .viewer-container {
+      width: 100%;
+      height: 290px;
+      background: #0f172a;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    #viewer-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .viewer-hint {
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      right: 10px;
+      text-align: center;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(15, 23, 42, 0.65);
+      padding: 4px 8px;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .viewer-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+      pointer-events: none;
+    }
+
+    .stats-box {
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 5px 0;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-val {
+      font-weight: 600;
+    }
+
+    .total-price-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .total-price-box span:first-child {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .total-price {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    .btn-outline {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-download-stl {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-download-stl:hover {
+      background: #dbeafe;
+    }
+
+    .client-order-success {
+      display: none;
+      margin-top: 18px;
+      padding: 18px;
+      border: 2px solid #86efac;
+      background: #f0fdf4;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .client-order-success h3 {
+      margin: 0 0 8px 0;
+      color: #166534;
+      font-size: 16px;
+    }
+
+    .qr-wrapper {
+      background: #fff;
+      padding: 14px;
+      border-radius: 10px;
+      display: inline-block;
+      border: 1px solid var(--border);
+      margin: 10px 0;
+    }
+
+    .qr-wrapper img,
+    .qr-wrapper canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+    }
+
+    .qr-payload-preview {
+      text-align: left;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text);
+      white-space: pre-wrap;
+      margin-top: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .pvz-section {
+      display: none;
+    }
+
+    .pvz-section.active {
+      display: block;
+    }
+
+    .order-item {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: #fff;
+    }
+
+    .order-item:hover {
+      border-color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .order-item.selected {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-new {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-accepted {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .qr-box {
+      text-align: center;
+      padding: 20px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+      padding: 16px;
+    }
+
+    .modal-card {
+      background: #fff;
+      padding: 26px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .pin-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 8px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      margin: 14px 0;
+      font-weight: 700;
+    }
+
+    .pin-error {
+      color: var(--danger);
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: fixed;
+        inset: 0;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1 id="app-title" title="Калькулятор 3D-печати">Калькулятор 3D-печати</h1>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-calc" onclick="switchTab('calc')">Заказ 3D-печати</button>
+      <button class="tab-btn" id="tab-pvz" onclick="switchTab('pvz')">🔒 Приёмка ПВЗ</button>
+      <button id="btn-lock-pvz" onclick="lockPvzAccess()" title="Скрыть раздел приёмки ПВЗ">Закрыть доступ</button>
+    </div>
+  </header>
+
+  <div id="section-calc" class="grid">
+    <div class="card">
+      <h2>Параметры модели и контакты</h2>
+
+      <div class="form-group">
+        <label>Файлы модели (STL — для точного авторасчёта и 3D-визуализации)</label>
+        <div class="file-drop" id="drop-zone" onclick="document.getElementById('stl-input').click()">
+          <div id="file-label"><strong>Нажмите для выбора STL-файла</strong> или перетащите его сюда</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Поддерживаются Binary и ASCII .STL файлы</div>
+          <input type="file" id="stl-input" accept=".stl">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Материал</label>
+        <input type="text" value="PETG (Прочный термостойкий пластик) — 8 ₽/г" readonly style="background: #f1f5f9; font-weight: 600; color: #0f172a;">
+      </div>
+
+      <div class="form-group">
+        <label>Цвет пластика: <span id="selected-color-name" style="color: var(--primary);">Белый</span></label>
+        <div class="color-palette" id="color-palette"></div>
+      </div>
+
+      <div class="slicer-box">
+        <div class="slicer-title">Настройки слайсера (влияют на точный расход пластика)</div>
+        <div>
+          <label for="infill-select">Заполнение</label>
+          <select id="infill-select" onchange="recalculate()">
+            <option value="0.15">15% (Лёгкое)</option>
+            <option value="0.20" selected>20% (Стандарт)</option>
+            <option value="0.35">35% (Плотное)</option>
+            <option value="0.50">50% (Усиленное)</option>
+            <option value="1.00">100% (Монолит)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="manual-weight">Расчётный вес детали (г) — заполняется автоматически по STL</label>
+        <input type="number" id="manual-weight" value="50" min="1" step="0.1" oninput="onManualWeightInput()">
+      </div>
+
+      <div class="contact-box">
+        <div class="contact-title">Данные получателя и адрес</div>
+        <div class="form-row" style="margin-bottom: 10px;">
+          <div>
+            <label for="client-first-name">Имя *</label>
+            <input type="text" id="client-first-name" placeholder="Иван" required>
+          </div>
+          <div>
+            <label for="client-last-name">Фамилия *</label>
+            <input type="text" id="client-last-name" placeholder="Иванов" required>
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom: 10px;">
+          <div>
+            <label for="client-phone">Номер телефона *</label>
+            <input type="tel" id="client-phone" placeholder="+7 (999) 123-45-67" required>
+          </div>
+          <div>
+            <label for="client-email">Электронная почта *</label>
+            <input type="email" id="client-email" placeholder="client@example.ru" required>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="client-address">Адрес доставки / ПВЗ *</label>
+          <input type="text" id="client-address" placeholder="г. Новосибирск, ул. Ленина, д. 10, кв. 25" required>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="order-comment">Комментарий к заказу</label>
+        <textarea id="order-comment" rows="2" placeholder="Пожелания по печати, ориентации или упаковке..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3D-предпросмотр и расчёт</h2>
+
+      <div class="viewer-container" id="viewer-box">
+        <canvas id="viewer-canvas"></canvas>
+        <div class="viewer-placeholder" id="viewer-placeholder">
+          Загрузите STL-файл, чтобы увидеть 3D-модель<br>и получить точный расчёт по сетке
+        </div>
+        <div class="viewer-hint">ЛКМ — вращение | Колёсико — масштаб | ПКМ — сдвиг</div>
+      </div>
+
+      <div class="stats-box">
+        <div class="stat-row">
+          <span>Габариты (X × Y × Z):</span>
+          <span class="stat-val" id="stat-dims">— мм</span>
+        </div>
+        <div class="stat-row">
+          <span>Чистый объём модели (100%):</span>
+          <span class="stat-val" id="stat-vol">— см³</span>
+        </div>
+        <div class="stat-row">
+          <span>Площадь поверхности:</span>
+          <span class="stat-val" id="stat-area">— см²</span>
+        </div>
+        <div class="stat-row">
+          <span>Оболочка / Заполнение:</span>
+          <span class="stat-val" id="stat-breakdown">— г / — г</span>
+        </div>
+        <div class="stat-row">
+          <span>Итоговый расход PETG (1.27 г/см³):</span>
+          <span class="stat-val" id="stat-weight">50.0 г</span>
+        </div>
+        <div class="stat-row">
+          <span>Тариф (8 ₽/г):</span>
+          <span class="stat-val" id="stat-rate">400 ₽</span>
+        </div>
+      </div>
+
+      <div class="total-price-box">
+        <span>Расчётная стоимость</span>
+        <span class="total-price" id="total-price">400 ₽</span>
+      </div>
+
+      <button class="btn btn-primary" onclick="createOrder()">Оформить заказ</button>
+
+      <div class="client-order-success" id="client-order-success">
+        <h3>✅ Заказ <span id="client-order-id"></span> успешно оформлен!</h3>
+        <p style="font-size: 14px; color: #166534; margin: 0; font-weight: 500;">
+          Мы с вами свяжемся в течение дня для подтверждения оплаты и деталей заказа.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="section-pvz" class="pvz-section">
+    <div class="grid">
+      <div class="card">
+        <h2>Оформленные заказы для приёмки</h2>
+        <div id="orders-list"></div>
+      </div>
+
+      <div class="card">
+        <h2>QR-код отправления и проверка (Админ)</h2>
+        <div class="qr-box">
+          <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;" id="pvz-qr-title">Выберите заказ из списка слева</div>
+          <div class="qr-wrapper" id="pvz-qr-wrapper" style="display: none;">
+            <img id="pvz-qr-img" alt="QR-код заказа" style="width: 260px; height: 260px; image-rendering: pixelated;" />
+          </div>
+          <div class="qr-payload-preview" id="pvz-qr-text" style="display: none;"></div>
+          <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-outline" style="width: auto; padding: 8px 16px;" onclick="printQr()">🖨 Печать QR-кода</button>
+            <button class="btn btn-outline" style="width: auto; padding: 8px 16px;" onclick="downloadQr()">⬇ Скачать QR</button>
+            <button class="btn btn-primary" id="btn-admin-download-stl" style="width: auto; padding: 8px 16px; display: none;" onclick="downloadSelectedOrderStl()">📦 Скачать STL-файл</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="manual-order-code">Или введите номер заказа вручную / отсканируйте</label>
+          <input type="text" id="manual-order-code" placeholder="Например: ORD-1001">
+        </div>
+
+        <button class="btn btn-success" onclick="confirmAcceptance()">✅ Подтвердить приёмку</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="print-area" style="display: none;">
+  <h2 id="print-title" style="margin-bottom: 12px;"></h2>
+  <img id="print-qr-img" style="width: 300px; height: 300px; image-rendering: pixelated;" />
+  <pre id="print-subtitle" style="margin-top: 14px; font-size: 13px; text-align: left; border: 1px solid #ccc; padding: 12px; border-radius: 8px;"></pre>
+</div>
+
+<div id="order-confirm-modal" class="modal-overlay">
+  <div class="modal-card">
+    <div style="font-size: 42px; margin-bottom: 8px;">✅</div>
+    <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #166534;">Заказ <span id="modal-order-id"></span> оформлен!</h3>
+    <p style="margin: 0 0 18px 0; font-size: 15px; color: var(--text); line-height: 1.5;">
+      Мы с вами свяжемся в течение дня для подтверждения оплаты и деталей заказа.
+    </p>
+    <button class="btn btn-primary" onclick="closeOrderConfirmModal()">Понятно</button>
+  </div>
+</div>
+
+<div id="secret-modal" class="modal-overlay">
+  <div class="modal-card">
+    <h3 style="margin: 0 0 6px 0; font-size: 19px;">Доступ для сотрудников</h3>
+    <p style="margin: 0; font-size: 13px; color: var(--text-muted);">Введите секретный код приёмки ПВЗ:</p>
+    <input type="password" id="secret-pin-input" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
+    <div id="pin-error" class="pin-error">Неверный код доступа</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeSecretModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="checkSecretPin()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+  const SECRET_CODE = "1976";
+  const PETG_PRICE_PER_GRAM = 8;
+  const PETG_DENSITY = 1.27;
+  const DEFAULT_WALLS = 3;
+  const DEFAULT_SUPPORTS = 0;
+
+  const DB_NAME = "PetgStlFilesDB";
+  const STORE_NAME = "stl_files";
+
+  function openFilesDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: "orderId" });
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function saveOrderStlFile(orderId, file) {
+    if (!file) return;
+    try {
+      const db = await openFilesDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.put({
+          orderId: orderId,
+          fileName: file.name,
+          fileBlob: file,
+          savedAt: Date.now()
+        });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch (err) {
+      console.error("Ошибка сохранения STL-файла в IndexedDB:", err);
+    }
+  }
+
+  async function getOrderStlFile(orderId) {
+    try {
+      const db = await openFilesDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(orderId);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (err) {
+      console.error("Ошибка чтения STL-файла из IndexedDB:", err);
+      return null;
+    }
+  }
+
+  async function downloadOrderStl(orderId, event) {
+    if (event) event.stopPropagation();
+    const record = await getOrderStlFile(orderId);
+    if (!record || !record.fileBlob) {
+      alert("Для этого заказа исходный STL-файл не прикреплён (возможно, был выполнен ручной расчёт по весу или заказ тестовый).");
+      return;
+    }
+    const url = URL.createObjectURL(record.fileBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = record.fileName || `${orderId}.stl`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function downloadSelectedOrderStl() {
+    if (!selectedPvzOrder) {
+      alert("Сначала выберите заказ из списка слева.");
+      return;
+    }
+    downloadOrderStl(selectedPvzOrder.id);
+  }
+
+  const COLORS = [
+    { name: "Белый", hex: "#f8fafc" },
+    { name: "Чёрный", hex: "#1e293b" },
+    { name: "Серый графит", hex: "#64748b" },
+    { name: "Красный", hex: "#dc2626" },
+    { name: "Синий", hex: "#2563eb" },
+    { name: "Зелёный", hex: "#16a34a" },
+    { name: "Жёлтый", hex: "#eab308" },
+    { name: "Оранжевый", hex: "#f97316" },
+    { name: "Фиолетовый", hex: "#9333ea" },
+    { name: "Натуральный / Прозрачный", hex: "#cbd5e1" }
+  ];
+
+  let selectedColor = COLORS[0];
+  let uploadedStlFile = null;
+  let stlMetrics = null;
+  let currentCalc = { weight: 50, price: 400, shellGrams: 0, infillGrams: 0 };
+  let selectedPvzOrder = null;
+  let currentPvzQrDataUrl = "";
+
+  let orders = JSON.parse(localStorage.getItem("petg_orders_v5") || "[]");
+  if (orders.length === 0) {
+    orders = [
+      {
+        id: "ORD-1001",
+        firstName: "Алексей",
+        lastName: "Смирнов",
+        clientName: "Алексей Смирнов",
+        clientPhone: "+7 (913) 555-12-34",
+        clientEmail: "alex.smirnov@mail.ru",
+        clientAddress: "г. Новосибирск, Красный проспект, д. 45, кв. 12",
+        fileName: "korpus_datchika.stl",
+        hasAttachedFile: false,
+        dims: "64.0 × 48.0 × 22.5 мм",
+        volume: "18.40 см³",
+        color: "Чёрный",
+        infill: "20%",
+        weight: 42.5,
+        price: 340,
+        comment: "Срочная печать",
+        status: "Ожидает приёмки",
+        date: new Date().toLocaleDateString("ru-RU")
+      }
+    ];
+    saveOrders();
+  }
+
+  function saveOrders() {
+    localStorage.setItem("petg_orders_v5", JSON.stringify(orders));
+  }
+
+  function buildFullOrderQrText(order) {
+    const fullName = [order.firstName, order.lastName].filter(Boolean).join(" ") || order.clientName || "Не указано";
+    return [
+      `ЗАКАЗ: ${order.id} (${order.date})`,
+      `ИМЯ: ${order.firstName || fullName}`,
+      `ФАМИЛИЯ: ${order.lastName || "—"}`,
+      `ТЕЛ: ${order.clientPhone}`,
+      `АДРЕС: ${order.clientAddress || "Не указан"}`,
+      `EMAIL: ${order.clientEmail}`,
+      `ФАЙЛ: ${order.fileName}${order.hasAttachedFile ? " [прикреплён]" : ""}`,
+      `ГАБАРИТЫ: ${order.dims}`,
+      `ОБЪЁМ: ${order.volume}`,
+      `МАТЕРИАЛ: PETG (${order.color})`,
+      `ЗАПОЛНЕНИЕ: ${order.infill}`,
+      `ВЕС: ${order.weight.toFixed(1)} г | СУММА: ${order.price} ₽`,
+      `КОММЕНТАРИЙ: ${order.comment || "нет"}`
+    ].join("\n");
+  }
+
+  function renderAdminQrCode(text) {
+    const imgEl = document.getElementById("pvz-qr-img");
+    const wrapperEl = document.getElementById("pvz-qr-wrapper");
+    if (!imgEl) return;
+
+    wrapperEl.style.display = "inline-block";
+    currentPvzQrDataUrl = "";
+
+    const utf8Text = unescape(encodeURIComponent(text));
+
+    if (typeof QRCode !== "undefined") {
+      try {
+        const tempDiv = document.createElement("div");
+        new QRCode(tempDiv, {
+          text: utf8Text,
+          width: 280,
+          height: 280,
+          colorDark: "#0f172a",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.L
+        });
+
+        setTimeout(() => {
+          const canvas = tempDiv.querySelector("canvas");
+          const generatedImg = tempDiv.querySelector("img");
+          if (canvas) {
+            currentPvzQrDataUrl = canvas.toDataURL("image/png");
+            imgEl.src = currentPvzQrDataUrl;
+          } else if (generatedImg && generatedImg.src) {
+            currentPvzQrDataUrl = generatedImg.src;
+            imgEl.src = currentPvzQrDataUrl;
+          } else {
+            fallbackExternalQr(text, imgEl);
+          }
+        }, 50);
+        return;
+      } catch (err) {
+        console.warn("Ошибка локального генератора QR, используем резервный:", err);
+      }
+    }
+
+    fallbackExternalQr(text, imgEl);
+  }
+
+  function fallbackExternalQr(text, imgEl) {
+    const url = "https://api.qrserver.com/v1/create-qr-code/?size=280x280&charset-source=UTF-8&data=" + encodeURIComponent(text);
+    imgEl.crossOrigin = "anonymous";
+    imgEl.src = url;
+    currentPvzQrDataUrl = url;
+  }
+
+  const paletteEl = document.getElementById("color-palette");
+  COLORS.forEach((c, idx) => {
+    const swatch = document.createElement("div");
+    swatch.className = "color-swatch" + (idx === 0 ? " selected" : "");
+    swatch.style.backgroundColor = c.hex;
+    swatch.title = c.name;
+    swatch.onclick = () => {
+      document.querySelectorAll(".color-swatch").forEach(el => el.classList.remove("selected"));
+      swatch.classList.add("selected");
+      selectedColor = c;
+      document.getElementById("selected-color-name").textContent = c.name;
+      if (meshMaterial) {
+        meshMaterial.color.set(c.hex);
+      }
+    };
+    paletteEl.appendChild(swatch);
+  });
+
+  let scene, camera, renderer, controls, currentMesh, meshMaterial;
+
+  function init3D() {
+    if (typeof THREE === "undefined") return;
+    const container = document.getElementById("viewer-box");
+    const canvas = document.getElementById("viewer-canvas");
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f172a);
+
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
+    camera.position.set(120, 100, 120);
+
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const gridHelper = new THREE.GridHelper(220, 22, 0x334155, 0x1e293b);
+    scene.add(gridHelper);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.75);
+    dirLight1.position.set(100, 200, 150);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x93c5fd, 0.35);
+    dirLight2.position.set(-100, -50, -100);
+    scene.add(dirLight2);
+
+    if (typeof THREE.OrbitControls !== "undefined") {
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+    }
+
+    window.addEventListener("resize", () => {
+      if (!container.clientWidth || !container.clientHeight) return;
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (controls) controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  }
+
+  init3D();
+
+  const fileInput = document.getElementById("stl-input");
+  const dropZone = document.getElementById("drop-zone");
+
+  fileInput.addEventListener("change", (e) => {
+    if (e.target.files.length) handleSTLFile(e.target.files[0]);
+  });
+
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+  });
+
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+  });
+
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    if (e.dataTransfer.files.length) handleSTLFile(e.dataTransfer.files[0]);
+  });
+
+  function handleSTLFile(file) {
+    if (!file.name.toLowerCase().endsWith(".stl")) {
+      alert("Пожалуйста, выберите файл в формате .STL");
+      return;
+    }
+
+    uploadedStlFile = file;
+    const sizeKb = (file.size / 1024).toFixed(1);
+    document.getElementById("file-label").innerHTML = `<strong>Прикреплён файл:</strong> ${file.name} (${sizeKb} КБ)`;
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      const buffer = event.target.result;
+      const parsed = parseSTL(buffer);
+      if (!parsed || parsed.positions.length === 0) {
+        alert("Не удалось прочитать геометрию STL-файла.");
+        uploadedStlFile = null;
+        return;
+      }
+
+      stlMetrics = {
+        volumeCm3: parsed.volumeMm3 / 1000.0,
+        areaCm2: parsed.areaMm2 / 100.0,
+        dimsMm: parsed.dimsMm,
+        fileName: file.name
+      };
+
+      renderMesh3D(parsed.positions, parsed.normals);
+      recalculate();
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  function parseSTL(buffer) {
+    const view = new DataView(buffer);
+    let isBinary = false;
+
+    if (buffer.byteLength >= 84) {
+      const triCount = view.getUint32(80, true);
+      const expectedSize = 84 + triCount * 50;
+      if (expectedSize === buffer.byteLength) {
+        isBinary = true;
+      }
+    }
+
+    let positions = [];
+    let normals = [];
+
+    if (isBinary) {
+      const triCount = view.getUint32(80, true);
+      positions = new Float32Array(triCount * 9);
+      normals = new Float32Array(triCount * 9);
+      let offset = 84;
+
+      for (let i = 0; i < triCount; i++) {
+        const nx = view.getFloat32(offset, true);
+        const ny = view.getFloat32(offset + 4, true);
+        const nz = view.getFloat32(offset + 8, true);
+        offset += 12;
+
+        for (let v = 0; v < 3; v++) {
+          const idx = i * 9 + v * 3;
+          positions[idx] = view.getFloat32(offset, true);
+          positions[idx + 1] = view.getFloat32(offset + 4, true);
+          positions[idx + 2] = view.getFloat32(offset + 8, true);
+
+          normals[idx] = nx;
+          normals[idx + 1] = ny;
+          normals[idx + 2] = nz;
+          offset += 12;
+        }
+        offset += 2;
+      }
+    } else {
+      const text = new TextDecoder().decode(buffer);
+      const vertexRegex = /vertex\s+([+-]?\d*\.?\d+(?:[eE][+-]?\d+)?)\s+([+-]?\d*\.?\d+(?:[eE][+-]?\d+)?)\s+([+-]?\d*\.?\d+(?:[eE][+-]?\d+)?)/g;
+      const posList = [];
+      let match;
+      while ((match = vertexRegex.exec(text)) !== null) {
+        posList.push(parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3]));
+      }
+      positions = new Float32Array(posList);
+      normals = new Float32Array(posList.length);
+    }
+
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+    let signedVolume6 = 0;
+    let totalArea = 0;
+
+    for (let i = 0; i < positions.length; i += 9) {
+      const x1 = positions[i],     y1 = positions[i + 1], z1 = positions[i + 2];
+      const x2 = positions[i + 3], y2 = positions[i + 4], z2 = positions[i + 5];
+      const x3 = positions[i + 6], y3 = positions[i + 7], z3 = positions[i + 8];
+
+      minX = Math.min(minX, x1, x2, x3);
+      minY = Math.min(minY, y1, y2, y3);
+      minZ = Math.min(minZ, z1, z2, z3);
+      maxX = Math.max(maxX, x1, x2, x3);
+      maxY = Math.max(maxY, y1, y2, y3);
+      maxZ = Math.max(maxZ, z1, z2, z3);
+
+      const v321 = x3 * y2 * z1;
+      const v231 = x2 * y3 * z1;
+      const v312 = x3 * y1 * z2;
+      const v132 = x1 * y3 * z2;
+      const v213 = x2 * y1 * z3;
+      const v123 = x1 * y2 * z3;
+      signedVolume6 += (-v321 + v231 + v312 - v132 - v213 + v123);
+
+      const ux = x2 - x1, uy = y2 - y1, uz = z2 - z1;
+      const vx = x3 - x1, vy = y3 - y1, vz = z3 - z1;
+      const cx = uy * vz - uz * vy;
+      const cy = uz * vx - ux * vz;
+      const cz = ux * vy - uy * vx;
+      totalArea += 0.5 * Math.sqrt(cx * cx + cy * cy + cz * cz);
+    }
+
+    const volumeMm3 = Math.abs(signedVolume6 / 6.0);
+    const dimsMm = {
+      x: Math.max(0, maxX - minX),
+      y: Math.max(0, maxY - minY),
+      z: Math.max(0, maxZ - minZ)
+    };
+
+    return { positions, normals, volumeMm3, areaMm2: totalArea, dimsMm };
+  }
+
+  function renderMesh3D(positions, normals) {
+    if (!scene || typeof THREE === "undefined") return;
+    document.getElementById("viewer-placeholder").style.display = "none";
+
+    if (currentMesh) {
+      scene.remove(currentMesh);
+      currentMesh.geometry.dispose();
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.computeVertexNormals();
+    geometry.computeBoundingBox();
+
+    const bbox = geometry.boundingBox;
+    const center = new THREE.Vector3();
+    bbox.getCenter(center);
+
+    geometry.translate(-center.x, -center.y, -bbox.min.z);
+    geometry.rotateX(-Math.PI / 2);
+
+    meshMaterial = new THREE.MeshStandardMaterial({
+      color: selectedColor.hex,
+      roughness: 0.38,
+      metalness: 0.08
+    });
+
+    currentMesh = new THREE.Mesh(geometry, meshMaterial);
+    scene.add(currentMesh);
+
+    const size = new THREE.Vector3();
+    new THREE.Box3().setFromObject(currentMesh).getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z, 20);
+
+    camera.position.set(maxDim * 1.4, maxDim * 1.1, maxDim * 1.4);
+    if (controls) {
+      controls.target.set(0, size.y / 2, 0);
+      controls.update();
+    }
+  }
+
+  function recalculate() {
+    const infill = parseFloat(document.getElementById("infill-select").value);
+
+    if (stlMetrics) {
+      const { volumeCm3, areaCm2, dimsMm } = stlMetrics;
+      const wallThicknessCm = DEFAULT_WALLS * 0.04;
+
+      const shellVolCm3 = Math.min(volumeCm3, areaCm2 * wallThicknessCm);
+      const innerVolCm3 = Math.max(0, volumeCm3 - shellVolCm3);
+
+      const effectiveVolCm3 = (shellVolCm3 + innerVolCm3 * infill) * (1 + DEFAULT_SUPPORTS);
+      const shellGrams = shellVolCm3 * PETG_DENSITY;
+      const infillGrams = (effectiveVolCm3 - shellVolCm3) * PETG_DENSITY;
+      const totalGrams = Math.max(0.5, effectiveVolCm3 * PETG_DENSITY);
+      const totalPrice = Math.round(totalGrams * PETG_PRICE_PER_GRAM);
+
+      currentCalc = { weight: totalGrams, price: totalPrice, shellGrams, infillGrams };
+
+      document.getElementById("manual-weight").value = totalGrams.toFixed(1);
+      document.getElementById("stat-dims").textContent = `${dimsMm.x.toFixed(1)} × ${dimsMm.y.toFixed(1)} × ${dimsMm.z.toFixed(1)} мм`;
+      document.getElementById("stat-vol").textContent = `${volumeCm3.toFixed(2)} см³`;
+      document.getElementById("stat-area").textContent = `${areaCm2.toFixed(1)} см²`;
+      document.getElementById("stat-breakdown").textContent = `${shellGrams.toFixed(1)} г / ${Math.max(0, infillGrams).toFixed(1)} г`;
+      document.getElementById("stat-weight").textContent = `${totalGrams.toFixed(1)} г`;
+      document.getElementById("stat-rate").textContent = `${totalPrice} ₽`;
+      document.getElementById("total-price").textContent = `${totalPrice} ₽`;
+    } else {
+      onManualWeightInput();
+    }
+  }
+
+  function onManualWeightInput() {
+    const w = Math.max(0.1, parseFloat(document.getElementById("manual-weight").value) || 0);
+    const totalPrice = Math.round(w * PETG_PRICE_PER_GRAM);
+    currentCalc = { weight: w, price: totalPrice, shellGrams: 0, infillGrams: 0 };
+
+    document.getElementById("stat-weight").textContent = `${w.toFixed(1)} г`;
+    document.getElementById("stat-rate").textContent = `${totalPrice} ₽`;
+    document.getElementById("total-price").textContent = `${totalPrice} ₽`;
+  }
+
+  async function createOrder() {
+    const firstName = document.getElementById("client-first-name").value.trim();
+    const lastName = document.getElementById("client-last-name").value.trim();
+    const clientPhone = document.getElementById("client-phone").value.trim();
+    const clientEmail = document.getElementById("client-email").value.trim();
+    const clientAddress = document.getElementById("client-address").value.trim();
+    const comment = document.getElementById("order-comment").value.trim();
+
+    if (!firstName) {
+      alert("Пожалуйста, укажите имя.");
+      document.getElementById("client-first-name").focus();
+      return;
+    }
+    if (!lastName) {
+      alert("Пожалуйста, укажите фамилию.");
+      document.getElementById("client-last-name").focus();
+      return;
+    }
+    if (!clientPhone) {
+      alert("Пожалуйста, укажите номер телефона.");
+      document.getElementById("client-phone").focus();
+      return;
+    }
+    if (!clientEmail || !clientEmail.includes("@")) {
+      alert("Пожалуйста, укажите корректный адрес электронной почты.");
+      document.getElementById("client-email").focus();
+      return;
+    }
+    if (!clientAddress) {
+      alert("Пожалуйста, укажите адрес доставки или ПВЗ.");
+      document.getElementById("client-address").focus();
+      return;
+    }
+
+    const infillEl = document.getElementById("infill-select");
+    const nextNum = 1001 + orders.length;
+    const orderId = `ORD-${nextNum}`;
+    const hasFile = Boolean(uploadedStlFile);
+
+    if (hasFile) {
+      await saveOrderStlFile(orderId, uploadedStlFile);
+    }
+
+    const newOrder = {
+      id: orderId,
+      firstName,
+      lastName,
+      clientName: `${firstName} ${lastName}`,
+      clientPhone,
+      clientEmail,
+      clientAddress,
+      fileName: uploadedStlFile ? uploadedStlFile.name : (stlMetrics ? stlMetrics.fileName : "Ручной расчёт по весу"),
+      hasAttachedFile: hasFile,
+      dims: stlMetrics
+        ? `${stlMetrics.dimsMm.x.toFixed(1)} × ${stlMetrics.dimsMm.y.toFixed(1)} × ${stlMetrics.dimsMm.z.toFixed(1)} мм`
+        : "Не заданы",
+      volume: stlMetrics ? `${stlMetrics.volumeCm3.toFixed(2)} см³` : "—",
+      color: selectedColor.name,
+      infill: infillEl.options[infillEl.selectedIndex].text.split(" ")[0],
+      weight: currentCalc.weight,
+      price: currentCalc.price,
+      comment,
+      status: "Ожидает приёмки",
+      date: new Date().toLocaleDateString("ru-RU")
+    };
+
+    orders.unshift(newOrder);
+    saveOrders();
+    renderPvzOrders();
+
+    document.getElementById("client-order-id").textContent = orderId;
+    document.getElementById("client-order-success").style.display = "block";
+
+    document.getElementById("modal-order-id").textContent = orderId;
+    document.getElementById("order-confirm-modal").style.display = "flex";
+  }
+
+  function closeOrderConfirmModal() {
+    document.getElementById("order-confirm-modal").style.display = "none";
+  }
+
+  function printQr() {
+    if (!selectedPvzOrder || !currentPvzQrDataUrl) {
+      alert("Сначала выберите заказ из списка слева.");
+      return;
+    }
+
+    document.getElementById("print-title").textContent = `Этикетка заказа ${selectedPvzOrder.id}`;
+    document.getElementById("print-qr-img").src = currentPvzQrDataUrl;
+    document.getElementById("print-subtitle").textContent = buildFullOrderQrText(selectedPvzOrder);
+
+    setTimeout(() => window.print(), 150);
+  }
+
+  function downloadQr() {
+    if (!selectedPvzOrder || !currentPvzQrDataUrl) {
+      alert("Сначала выберите заказ из списка слева.");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.download = `QR_${selectedPvzOrder.id}.png`;
+    link.href = currentPvzQrDataUrl;
+    link.click();
+  }
+
+  let clickCount = 0;
+  let clickTimer = null;
+
+  document.getElementById("app-title").addEventListener("click", () => {
+    clickCount++;
+    clearTimeout(clickTimer);
+    if (clickCount === 3) {
+      clickCount = 0;
+      openSecretModal();
+    } else {
+      clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
+      e.preventDefault();
+      openSecretModal();
+    }
+  });
+
+  function openSecretModal() {
+    if (sessionStorage.getItem("pvz_unlocked") === "true") {
+      unlockPvzAccess();
+      return;
+    }
+    const modal = document.getElementById("secret-modal");
+    const input = document.getElementById("secret-pin-input");
+    document.getElementById("pin-error").style.display = "none";
+    input.value = "";
+    modal.style.display = "flex";
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function closeSecretModal() {
+    document.getElementById("secret-modal").style.display = "none";
+  }
+
+  document.getElementById("secret-pin-input").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") checkSecretPin();
+  });
+
+  function checkSecretPin() {
+    const val = document.getElementById("secret-pin-input").value.trim();
+    if (val === SECRET_CODE) {
+      sessionStorage.setItem("pvz_unlocked", "true");
+      closeSecretModal();
+      unlockPvzAccess();
+    } else {
+      document.getElementById("pin-error").style.display = "block";
+      document.getElementById("secret-pin-input").value = "";
+    }
+  }
+
+  function unlockPvzAccess() {
+    document.getElementById("tab-pvz").style.display = "inline-block";
+    document.getElementById("btn-lock-pvz").style.display = "inline-block";
+    switchTab("pvz");
+    renderPvzOrders();
+  }
+
+  function lockPvzAccess() {
+    sessionStorage.removeItem("pvz_unlocked");
+    document.getElementById("tab-pvz").style.display = "none";
+    document.getElementById("btn-lock-pvz").style.display = "none";
+    switchTab("calc");
+  }
+
+  function switchTab(tab) {
+    document.getElementById("tab-calc").classList.toggle("active", tab === "calc");
+    document.getElementById("tab-pvz").classList.toggle("active", tab === "pvz");
+
+    document.getElementById("section-calc").style.display = tab === "calc" ? "grid" : "none";
+    document.getElementById("section-pvz").classList.toggle("active", tab === "pvz");
+  }
+
+  function renderPvzOrders() {
+    const listEl = document.getElementById("orders-list");
+    listEl.innerHTML = "";
+
+    orders.forEach((order) => {
+      const item = document.createElement("div");
+      item.className = "order-item" + (selectedPvzOrder && selectedPvzOrder.id === order.id ? " selected" : "");
+      const isAccepted = order.status === "Принят на ПВЗ";
+      const displayName = [order.firstName, order.lastName].filter(Boolean).join(" ") || order.clientName;
+
+      const downloadBtnHtml = order.hasAttachedFile
+        ? `<div><button class="btn-download-stl" onclick="downloadOrderStl('${order.id}', event)">⬇ Скачать STL (${order.fileName})</button></div>`
+        : "";
+
+      item.innerHTML = `
+        <div class="order-header">
+          <span>${order.id} — ${displayName}</span>
+          <span class="badge ${isAccepted ? "badge-accepted" : "badge-new"}">${order.status}</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">
+          📞 ${order.clientPhone} | ✉️ ${order.clientEmail}<br>
+          📍 ${order.clientAddress || "Адрес не указан"}<br>
+          📦 ${order.fileName} | PETG (${order.color}) | ${order.weight.toFixed(1)} г — <strong>${order.price} ₽</strong>
+        </div>
+        ${downloadBtnHtml}
+      `;
+
+      item.onclick = () => selectPvzOrder(order);
+      listEl.appendChild(item);
+    });
+  }
+
+  function selectPvzOrder(order) {
+    selectedPvzOrder = order;
+    renderPvzOrders();
+
+    const displayName = [order.firstName, order.lastName].filter(Boolean).join(" ") || order.clientName;
+    const qrText = buildFullOrderQrText(order);
+    document.getElementById("pvz-qr-title").textContent = `QR-код заказа ${order.id} (${displayName})`;
+    document.getElementById("pvz-qr-text").style.display = "block";
+    document.getElementById("pvz-qr-text").textContent = qrText;
+    document.getElementById("manual-order-code").value = order.id;
+
+    const adminStlBtn = document.getElementById("btn-admin-download-stl");
+    if (adminStlBtn) {
+      adminStlBtn.style.display = order.hasAttachedFile ? "inline-block" : "none";
+    }
+
+    renderAdminQrCode(qrText);
+  }
+
+  function confirmAcceptance() {
+    const inputCode = document.getElementById("manual-order-code").value.trim().toUpperCase();
+    const targetId = inputCode || (selectedPvzOrder ? selectedPvzOrder.id : "");
+
+    if (!targetId) {
+      alert("Выберите заказ из списка или введите его номер.");
+      return;
+    }
+
+    const found = orders.find(o => o.id.toUpperCase() === targetId);
+    if (!found) {
+      alert(`Заказ с номером ${targetId} не найден.`);
+      return;
+    }
+
+    const displayName = [found.firstName, found.lastName].filter(Boolean).join(" ") || found.clientName;
+    found.status = "Принят на ПВЗ";
+    saveOrders();
+    selectPvzOrder(found);
+    alert(`✅ Заказ ${found.id} (${displayName}) успешно принят на ПВЗ!`);
+  }
+
+  if (sessionStorage.getItem("pvz_unlocked") === "true") {
+    document.getElementById("tab-pvz").style.display = "inline-block";
+    document.getElementById("btn-lock-pvz").style.display = "inline-block";
+    renderPvzOrders();
+  }
+</script>
+</body>
+</html>

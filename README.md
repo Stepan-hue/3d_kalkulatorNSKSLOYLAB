@@ -711,7 +711,7 @@
         <span class="total-price" id="total-price">400 ₽</span>
       </div>
 
-      <button class="<!DOCTYPE html>
+      <button class="btn btn-primary" onclick="createOrder(<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -720,8 +720,7 @@
 <body>
 
   <button id="sendBtn">Отправить заявку в ТГ</button>
-
-  <script>
+  /<script>
     const TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
     const CHAT_ID = "8323361173";
 
@@ -741,8 +740,7 @@
       .then(data => alert("Сообщение отправлено!"))
       .catch(err => console.error(err));
     });
-  </script>
-" onclick="createOrder()">Оформить заказ</button>
+)">Оформить заказ</button>
 
       <div class="client-order-success" id="client-order-success">
         <h3>✅ Заказ <span id="client-order-id"></span> успешно оформлен!</h3>

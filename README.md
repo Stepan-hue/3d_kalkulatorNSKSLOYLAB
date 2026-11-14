@@ -788,9 +788,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<script>
-    const TELEGRAM_BOT_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
+<script> const TELEGRAM_BOT_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
   const TELEGRAM_CHAT_ID = "8323361173";
 
   function escapeHtml(str) {
@@ -847,6 +845,7 @@
       console.error("Ошибка отправки в Telegram:", err);
     }
   }
+<script>
   const SECRET_CODE = "1976";
   const PETG_PRICE_PER_GRAM = 8;
   const PETG_DENSITY = 1.27;

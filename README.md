@@ -711,36 +711,7 @@
         <span class="total-price" id="total-price">400 ₽</span>
       </div>
 
-      <button class="btn btn-primary" onclick="createOrder(<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <title>Тест отправки</title>
-</head>
-<body>
-
-  <button id="sendBtn">Отправить заявку в ТГ</button>
-  /<script>
-    const TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
-    const CHAT_ID = "8323361173";
-
-    document.getElementById("sendBtn").addEventListener("click", function() {
-      const TEXT = "Новая заявка с сайта!";
-
-      fetch(`https://telegram.org{TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: TEXT,
-          parse_mode: "HTML"
-        })
-      })
-      .then(res => res.json())
-      .then(data => alert("Сообщение отправлено!"))
-      .catch(err => console.error(err));
-    });
-)">Оформить заказ</button>
+      <button class="btn btn-primary" onclick="createOrder()">Оформить заказ</button>
 
       <div class="client-order-success" id="client-order-success">
         <h3>✅ Заказ <span id="client-order-id"></span> успешно оформлен!</h3>
@@ -1590,6 +1561,39 @@
     document.getElementById("btn-lock-pvz").style.display = "inline-block";
     renderPvzOrders();
   }
+<script>
+  const TG_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
+  const TG_CHAT_ID = "8323361173";
+
+  // Находим кнопку "Оформить заказ" по её тексту
+  const buttons = document.querySelectorAll("button");
+  buttons.forEach(btn => {
+    if (btn.textContent.includes("Оформить заказ")) {
+      btn.addEventListener("click", function() {
+        // Собираем значения со всех полей ввода на странице
+        const inputs = document.querySelectorAll("input, textarea, select");
+        let orderDetails = "📦 <b>Новый заказ 3D-печати!</b>\n\n";
+
+        inputs.forEach(input => {
+          if (input.value && input.type !== "file" && input.type !== "password") {
+            const label = input.placeholder || input.name || input.id || "Поле";
+            orderDetails += `<b>${label}:</b> ${input.value}\n`;
+          }
+        });
+
+        // Отправляем собранные данные в Telegram
+        fetch(`https://telegram.org{TG_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TG_CHAT_ID,
+            text: orderDetails,
+            parse_mode: "HTML"
+          })
+        }).catch(err => console.error("Ошибка отправки в ТГ:", err));
+      });
+    }
+  });
 </script>
 </body>
 </html>

@@ -791,6 +791,8 @@
 
 <script>
   const SECRET_CODE = "1976";
+  const TG_BOT_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
+  const TG_CHAT_ID = "8323361173";
   const PETG_PRICE_PER_GRAM = 8;
   const PETG_DENSITY = 1.27;
   const DEFAULT_WALLS = 3;

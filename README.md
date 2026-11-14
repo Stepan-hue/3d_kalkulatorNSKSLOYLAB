@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -712,7 +711,7 @@
         <span class="total-price" id="total-price">400 ₽</span>
       </div>
 
-      <button class="btn btn-primary" onclick="createOrder()">Оформить заказ<!DOCTYPE html>
+      <button class="<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -743,6 +742,7 @@
       .catch(err => console.error(err));
     });
   </script>
+" onclick="createOrder()">Оформить заказ</button>
 
       <div class="client-order-success" id="client-order-success">
         <h3>✅ Заказ <span id="client-order-id"></span> успешно оформлен!</h3>

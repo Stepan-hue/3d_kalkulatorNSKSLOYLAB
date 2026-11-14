@@ -1301,8 +1301,39 @@
     document.getElementById("total-price").textContent = `${totalPrice} ₽`;
   }
 
-  async function createOrder() {
-    const firstName = document.getElementById("client-first-name").value.trim();
+  async function createOrder() {<script>
+  const TG_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
+  const TG_CHAT_ID = "8323361173";
+
+  // Находим кнопку "Оформить заказ" по её тексту
+  const buttons = document.querySelectorAll("button");
+  buttons.forEach(btn => {
+    if (btn.textContent.includes("Оформить заказ")) {
+      btn.addEventListener("click", function() {
+        // Собираем значения со всех полей ввода на странице
+        const inputs = document.querySelectorAll("input, textarea, select");
+        let orderDetails = "📦 <b>Новый заказ 3D-печати!</b>\n\n";
+
+        inputs.forEach(input => {
+          if (input.value && input.type !== "file" && input.type !== "password") {
+            const label = input.placeholder || input.name || input.id || "Поле";
+            orderDetails += `<b>${label}:</b> ${input.value}\n`;
+          }
+        });
+
+        // Отправляем собранные данные в Telegram
+        fetch(`https://telegram.org{TG_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TG_CHAT_ID,
+            text: orderDetails,
+            parse_mode: "HTML"
+          })
+        }).catch(err => console.error("Ошибка отправки в ТГ:", err));
+      });
+    }
+  }); const firstName = document.getElementById("client-first-name").value.trim();
     const lastName = document.getElementById("client-last-name").value.trim();
     const clientPhone = document.getElementById("client-phone").value.trim();
     const clientEmail = document.getElementById("client-email").value.trim();
@@ -1561,39 +1592,6 @@
     document.getElementById("btn-lock-pvz").style.display = "inline-block";
     renderPvzOrders();
   }
-<script>
-  const TG_TOKEN = "8612843915:AAFPBhs1zbg91huAZHfhab766N5Y-zvnNMI";
-  const TG_CHAT_ID = "8323361173";
-
-  // Находим кнопку "Оформить заказ" по её тексту
-  const buttons = document.querySelectorAll("button");
-  buttons.forEach(btn => {
-    if (btn.textContent.includes("Оформить заказ")) {
-      btn.addEventListener("click", function() {
-        // Собираем значения со всех полей ввода на странице
-        const inputs = document.querySelectorAll("input, textarea, select");
-        let orderDetails = "📦 <b>Новый заказ 3D-печати!</b>\n\n";
-
-        inputs.forEach(input => {
-          if (input.value && input.type !== "file" && input.type !== "password") {
-            const label = input.placeholder || input.name || input.id || "Поле";
-            orderDetails += `<b>${label}:</b> ${input.value}\n`;
-          }
-        });
-
-        // Отправляем собранные данные в Telegram
-        fetch(`https://telegram.org{TG_TOKEN}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: TG_CHAT_ID,
-            text: orderDetails,
-            parse_mode: "HTML"
-          })
-        }).catch(err => console.error("Ошибка отправки в ТГ:", err));
-      });
-    }
-  });
 </script>
 </body>
 </html>
